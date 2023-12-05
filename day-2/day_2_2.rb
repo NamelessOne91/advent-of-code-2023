@@ -2,29 +2,27 @@ script_directory = File.dirname(__FILE__)
 file_name = 'input.txt'
 file_path = File.join(script_directory, file_name)
 
-THRESHOLD = {
-  'red'=> 12,
-  'green' => 13,
-  'blue' => 14
-}.freeze
+power_sets_sum = 0
 
-
-ids_sum = 0
 def parse_game_results(results)
-  id = results.match(/Game (\d+):/)[1]
+  min_cubes = {
+    'green' => 0,
+    'red' => 0,
+    'blue' => 0
+  }
 
   results.split(': ')[1].gsub(';', ',').split(', ') do |cubes|
     number, color = cubes.split(' ')
     value = number.to_i
-    return 0 unless value <= THRESHOLD[color]
+
+    min_cubes[color] = value if value > min_cubes[color]
   end
 
-  id.to_i
+  min_cubes.values.reduce(1) { |accumulator, number| accumulator * number }
 end
 
 File.foreach(file_path) do |line|
-  ids_sum += parse_game_results(line)
+  power_sets_sum += parse_game_results(line)
 end
 
-puts ids_sum
-
+puts "Power sets sum: #{power_sets_sum}"
